@@ -16,8 +16,8 @@ console.log('Running in >>>>>', process.env.MODE, 'mode');
  
 // assign ports for dev and test modes
 var localPort = {
-  dev: 9000,
-  test: 9001
+  dev: 8000,
+  test: 8001
 };
 ///////////////////////////////////////////////////////////////////////
 
