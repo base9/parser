@@ -1,0 +1,19 @@
+{
+  "name": "base9-parsing",
+  "version": "1.0.0",
+  "description": "Add markdown-formatted readme here",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brianjscoles/parsing"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/brianjscoles/parsing/issues"
+  },
+  "homepage": "https://github.com/brianjscoles/parsing"
+}
