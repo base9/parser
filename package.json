@@ -15,5 +15,17 @@
   "bugs": {
     "url": "https://github.com/brianjscoles/parsing/issues"
   },
-  "homepage": "https://github.com/brianjscoles/parsing"
+  "homepage": "https://github.com/brianjscoles/parsing",
+  "dependencies": {
+    "bluebird": "^2.7.1",
+    "body-parser": "^1.10.1",
+    "bookshelf": "^0.7.9",
+    "connect-flash": "^0.1.1",
+    "express": "^4.11.0",
+    "knex": "^0.7.3",
+    "morgan": "^1.5.1",
+    "node-crontab": "0.0.8",
+    "pg": "^4.2.0",
+    "request": "^2.51.0"
+  }
 }

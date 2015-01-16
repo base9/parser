@@ -30,29 +30,19 @@ var router = require('./router');
 
 var app = express();
 
-require('./config/passport')(passport);
 
 // run app through config
 config.express(app);
 
 //run passport through config
-config.passport(app, passport);
 
 // use router for app
-router(app, passport);
+router(app);
 
 // expose http wrapped app as server to enable closing the server programmatically 
 var server = app.listen(process.env.PORT || localPort[process.env.MODE]);
 console.log('app listening on port:' + (process.env.PORT || localPort[process.env.MODE]));
 
-
-///////////////////////////////////////////////////////////////////////
-
-setTimeout(function(){
-  var eventSeed = require('./api/events/events.seed.js');
-},400);
-
-///////////////////////////////////////////////////////////////////////
 
 
 // expose app and server
