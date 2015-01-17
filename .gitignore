@@ -11,3 +11,4 @@ bin/*
 lib/*
 
 api_keys.js
+env_parameters.js

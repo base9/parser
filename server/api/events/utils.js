@@ -1,8 +1,8 @@
 //this will alter the global object 'Date'
 // require('./date.js');
 
-var Promise = require('bluebird');
-var request = Promise.promisify(require('request'));
+var Bluebird = require('bluebird');
+var request = Bluebird.promisify(require('request'));
 var Event = require('./events.model.js');
 
 
@@ -130,7 +130,7 @@ function getPopularity(rating){
 function generateRandomLong() {
     var num = (Math.random()*180);
     var posorneg = Math.round(Math.random());
-    if (posorneg == 0) {
+    if (posorneg === 0) {
         num = num * -1;
     }
     return num;
@@ -139,7 +139,7 @@ function generateRandomLong() {
 function generateRandomLat() {
     var num = (Math.random()*90);
     var posorneg = Math.round(Math.random());
-    if (posorneg == 0) {
+    if (posorneg === 0) {
         num = num * -1;
     }
     return num;
