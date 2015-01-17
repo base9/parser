@@ -1,24 +1,8 @@
 var Comment = require('./comments.model.js');
-var seed = require('./comments.seed.js');
-
 
 module.exports = {
-  addOne: addOne,
   addDummyComments: addDummyComments
 };
-
-function addOne(req, res) {
-  var newComment = new Comment({
-    user_id: req.body.user_id,
-    event_id: req.body.event_id,
-    comment: req.body.comment
-  })
-  .save()
-  .then(function(){
-    res.status(201).end();
-  });
-}
-
 
 
 function addDummyComments(userId,eventId, number){

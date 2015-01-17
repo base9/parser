@@ -1,4 +1,5 @@
 var Event = require('./events.model.js');
+var commentController = require('../comments/comments.controller.js');
 var Bluebird = require('bluebird');
 var request = Bluebird.promisify(require('request'));
 var utils = require('./utils.js');
@@ -11,7 +12,7 @@ var crontab = require('node-crontab');
 var cronJob = crontab.scheduleJob("1 */4 * * *", function () {
   console.log("****************it's cron time!******************");
   fetchBatchDataFromEventbriteAPI();
-  fetchBatchDataFromKimonoAPI();
+  //fetchBatchDataFromKimonoAPI();
 });
 
 
@@ -80,16 +81,21 @@ function getAddressFromCoords(coords) {
 //this function expects a large JSON object of events, that will be sent
 //periodically by a Kimono Labs scraper.  Function will parse the events
 //and add them to our DB.
-function fetchBatchDataFromKimonoAPI() {
-  request('https://www.kimonolabs.com/api/9djxfaym?apikey=' + process.env.KIMONO_API_KEY)
-  .then(function(res){
-    console.log('response received from kimono');
-    var events = JSON.parse(res[0].body).results.collection1; //split results and collection1 with if statements
-    var throttledAddEventFromKimono = utils.makeThrottledFunction(addEventFromKimono,2000);
-    for (var i = 0; i < events.length; i++) {
-      throttledAddEventFromKimono(events[i]);
-    }
-  });
+function fetchBatchDataFromKimonoAPI(req, res) {
+  console.log('request received at kimono endpoint!');
+  
+  res.status(400).end('Kimono fetching is currently disabled.');
+
+  // res.status(201).end();
+  // request('https://www.kimonolabs.com/api/9djxfaym?apikey=' + process.env.KIMONO_API_KEY)
+  // .then(function(res){
+  //   console.log('response received from kimono');
+  //   var events = JSON.parse(res[0].body).results.collection1; //split results and collection1 with if statements
+  //   var throttledAddEventFromKimono = utils.makeThrottledFunction(addEventFromKimono,2000);
+  //   for (var i = 0; i < events.length; i++) {
+  //     throttledAddEventFromKimono(events[i]);
+  //   }
+  // });
 }
 
 function addEventFromKimono(event){
@@ -131,8 +137,10 @@ function addEventFromKimono(event){
 
 var categories = [];
 
-function fetchBatchDataFromEventbriteAPI(){
+function fetchBatchDataFromEventbriteAPI(req, res){
   console.log('req received at eventbrite endpoint!');
+  res.status(201).end();
+
   var throttledFetchPageFromEventbriteAPI = utils.makeThrottledFunction(fetchPageFromEventbriteAPI,1500);
   var reqUrl = 'https://www.eventbriteapi.com/v3/events/search/?token=' + process.env.EVENTBRITE_API_TOKEN + '&start_date.keyword=today&venue.country=US';
   request(reqUrl)
