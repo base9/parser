@@ -1,6 +1,7 @@
 var Event = require('./events.model.js');
-var Promise = require('bluebird');
-var request = Promise.promisify(require('request'));
+var commentController = require('../comments/comments.controller.js');
+var Bluebird = require('bluebird');
+var request = Bluebird.promisify(require('request'));
 var utils = require('./utils.js');
 var crontab = require('node-crontab');
 
@@ -11,45 +12,20 @@ var crontab = require('node-crontab');
 var cronJob = crontab.scheduleJob("1 */4 * * *", function () {
   console.log("****************it's cron time!******************");
   fetchBatchDataFromEventbriteAPI();
-  fetchBatchDataFromKimonoAPI();
+  //fetchBatchDataFromKimonoAPI();
 });
 
 
 /********************* Module.exports *************************/
 
 module.exports = {
-  getAll: getAll,
-  getOne: getOne,
   addOne: addOne,
-  getLocal: getLocal,
   fetchBatchDataFromKimonoAPI: fetchBatchDataFromKimonoAPI,
   fetchBatchDataFromEventbriteAPI: fetchBatchDataFromEventbriteAPI,
-  getCoordsFromAddress: getCoordsFromAddress,
-  getAddressFromCoords: getAddressFromCoords,
   addManySpoofs: addManySpoofs
 };
 
 /******************** Generic DB interactions **********************/
-
-function getAll(req, res) {
-  Event.fetchAll()
-  .then(function (collection) {
-    utils.sendResponse(utils.formatAndTrimEventRecords(collection),res);
-  });
-}
-
-function getOne(req, res) {
-  Event.where({id:req.params.id}).fetch({
-      withRelated: ['user', 'photos', 'comments']
-    }).then(function (record) {
-      if(record){
-        utils.sendResponse(utils.formatAndTrimEventRecords([record])[0],res);
-      } else {
-        res.status(404).end('No event with that id.')
-      }
-
-  });
-}
 
 function addOne(req, res) {
   // TODO: if (!req.body.coords) -> Make util call for address string from coords.lat,coords.lng;
@@ -82,39 +58,6 @@ function addManySpoofs(req,res){
   }
 }
 
-function getLocal(req, res) {
-    
-    //two dates are used to get modified
-    var date1 = new Date();
-    var date2 = new Date();
-
-    //currentTime is used to keep track of current time
-    var currentTime = Date.now();
-
-    //beginningDate to current date at 3 a.m.
-    var beginningDate = date1.setHours(3, 0, 0, 0);
-
-    //endingDate to next day at 3 a.m.
-    date2.setDate(date1.getDate() + 1);
-    var endingDate = date2.setHours(3, 0, 0, 0);
-
-  Event.query(function(qb){
-
-    //Narrows down events based on specified location
-    qb.whereBetween('lat', [Math.min(req.query.lat1,req.query.lat2),Math.max(req.query.lat1,req.query.lat2)]);
-    qb.whereBetween('lng', [Math.min(req.query.lng1,req.query.lng2),Math.max(req.query.lng1,req.query.lng2)]);
-
-    //Narrows down events within specified ISO8601 time
-    qb.where('startTime', '<', endingDate)
-      .andWhere('endTime', '>', beginningDate)
-      .andWhere('endTime', '>', currentTime)
-      .orWhere('endTime', null);
-  })
-  .fetchAll()
-  .then(function (collection) {
-    utils.sendResponse(utils.formatAndTrimEventRecords(collection),res);
-  });
-}
 
 /************** Geocoding ******************/
 
@@ -138,16 +81,21 @@ function getAddressFromCoords(coords) {
 //this function expects a large JSON object of events, that will be sent
 //periodically by a Kimono Labs scraper.  Function will parse the events
 //and add them to our DB.
-function fetchBatchDataFromKimonoAPI() {
-  request('https://www.kimonolabs.com/api/9djxfaym?apikey=' + process.env.KIMONO_API_KEY)
-  .then(function(res){
-    console.log('response received from kimono');
-    var events = JSON.parse(res[0].body).results.collection1; //split results and collection1 with if statements
-    var throttledAddEventFromKimono = utils.makeThrottledFunction(addEventFromKimono,2000);
-    for (var i = 0; i < events.length; i++) {
-      throttledAddEventFromKimono(events[i]);
-    }
-  });
+function fetchBatchDataFromKimonoAPI(req, res) {
+  console.log('request received at kimono endpoint!');
+  
+  res.status(400).end('Kimono fetching is currently disabled.');
+
+  // res.status(201).end();
+  // request('https://www.kimonolabs.com/api/9djxfaym?apikey=' + process.env.KIMONO_API_KEY)
+  // .then(function(res){
+  //   console.log('response received from kimono');
+  //   var events = JSON.parse(res[0].body).results.collection1; //split results and collection1 with if statements
+  //   var throttledAddEventFromKimono = utils.makeThrottledFunction(addEventFromKimono,2000);
+  //   for (var i = 0; i < events.length; i++) {
+  //     throttledAddEventFromKimono(events[i]);
+  //   }
+  // });
 }
 
 function addEventFromKimono(event){
@@ -189,8 +137,10 @@ function addEventFromKimono(event){
 
 var categories = [];
 
-function fetchBatchDataFromEventbriteAPI(){
+function fetchBatchDataFromEventbriteAPI(req, res){
   console.log('req received at eventbrite endpoint!');
+  res.status(201).end();
+
   var throttledFetchPageFromEventbriteAPI = utils.makeThrottledFunction(fetchPageFromEventbriteAPI,1500);
   var reqUrl = 'https://www.eventbriteapi.com/v3/events/search/?token=' + process.env.EVENTBRITE_API_TOKEN + '&start_date.keyword=today&venue.country=US';
   request(reqUrl)
@@ -204,6 +154,7 @@ function fetchBatchDataFromEventbriteAPI(){
   });
 }
 
+
 function fetchPageFromEventbriteAPI(reqUrl,pageNumber){
   console.log("fetching page " + pageNumber);
   request(reqUrl + '&page=' + pageNumber)
@@ -214,7 +165,9 @@ function fetchPageFromEventbriteAPI(reqUrl,pageNumber){
         event.category = {name: 'Other'};
       }
       categories.push(event.category.name);
-      Event.where({title:event.name.text}).fetch().then(function (record) {
+      var trimmedId = event.id % 100000000;
+      
+      Event.where({id:trimmedId}).fetch().then(function (record) {
         if(!record){
           utils.addEventRecord({
             title: event.name.text,
@@ -226,16 +179,17 @@ function fetchPageFromEventbriteAPI(reqUrl,pageNumber){
             startTime: Date.parse(event.start.utc),
             endTime: Date.parse(event.end.utc),
             category: categoryFilter(event.category.name),
-            price: (event.ticket_classes[0].free ? 0 : ((event.ticket_classes[0].cost.value / 100) + (event.ticket_classes[0].fee.value / 100))),
+            price: getEventbritePrice(event),
             info: ((event.description && event.description.text) ? event.description.text.slice(0,2000) : ''),
-            popularity: Math.floor(Math.random()*100)
+            ratings: Math.floor(Math.random()*100),
+            id: trimmedId
             //TODO: user_id should be a special account reserved for Eventbrite_bot
             //TODO: do something better than a title match for preventing duplicate entries
           }).then(function(event_id){
             commentController.addDummyComments(1, event_id, 6);
           });
         } else {
-          console.log("event with that title already exists; skipping.");
+          console.log("event with that ID already exists; skipping.");
         }
       });
     });
@@ -259,5 +213,14 @@ function categoryFilter(eventCategory) {
     eventCategory = 'other';
   }
   return eventCategory;
+}
+
+function getEventbritePrice(event){
+  if(event.ticket_classes[0]){
+    if(!event.ticket_classes[0].free){
+      return (event.ticket_classes[0].cost.value + event.ticket_classes[0].fee.value) / 100;
+    } 
+  }
+  return 0;
 }
 

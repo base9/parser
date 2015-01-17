@@ -15,5 +15,25 @@
   "bugs": {
     "url": "https://github.com/brianjscoles/parsing/issues"
   },
-  "homepage": "https://github.com/brianjscoles/parsing"
+  "homepage": "https://github.com/brianjscoles/parsing",
+  "dependencies": {
+    "bluebird": "^2.7.1",
+    "body-parser": "^1.10.1",
+    "bookshelf": "^0.7.9",
+    "connect-flash": "^0.1.1",
+    "express": "^4.11.0",
+    "gulp": "^3.8.10",
+    "gulp-util": "^3.0.2",
+    "gulp-jshint": "^1.9.0",
+    "gulp-livereload": "^3.0.2",
+    "gulp-mocha": "^2.0.0",
+    "gulp-nodemon": "^1.0.4",
+    "gulp-plumber": "^0.6.6",
+    "gulp-sass": "^1.2.4",
+    "knex": "^0.7.3",
+    "morgan": "^1.5.1",
+    "node-crontab": "0.0.8",
+    "pg": "^4.2.0",
+    "request": "^2.51.0"
+  }
 }

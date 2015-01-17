@@ -4,7 +4,6 @@ var bookshelf = require('bookshelf');
 var Comment = bookshelf(db).Model.extend({
   tableName: 'comments',
   hasTimestamps: true,
-
 });
 
 module.exports = Comment;

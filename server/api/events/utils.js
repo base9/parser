@@ -1,8 +1,8 @@
 //this will alter the global object 'Date'
 // require('./date.js');
 
-var Promise = require('bluebird');
-var request = Promise.promisify(require('request'));
+var Bluebird = require('bluebird');
+var request = Bluebird.promisify(require('request'));
 var Event = require('./events.model.js');
 
 
@@ -20,8 +20,7 @@ module.exports = {
 //will use a validation helper before adding to the table.
 function addEventRecord(params, res){
   var validatedParams = validateEventRecord(params);
-  return new Event(validatedParams)
-    .save()
+  return new Event().save(validatedParams,{method:"insert"})
     .then(function(model){
       if(res){
         res.status(201).end(model.attributes.id.toString());
@@ -79,17 +78,18 @@ function formatAndTrimEventRecords(collection){
       
       //THESE LINES DEPRECATED: ratings table not in use.
       // event.attributes.ratings = event.relations.rating.length;
-      // event.attributes.popularity = getPopularity(event.attributes.ratings);
       delete event.relations.rating;
     }
     if(event.relations && event.relations.user){
       event.attributes.creator = event.relations.user.attributes.name;
       delete event.relations.user;
     }
+    event.attributes.popularity = getPopularity(event.attributes.ratings);
     return event;
   });
   return trimmed;
 }
+
 
 
 
@@ -130,7 +130,7 @@ function getPopularity(rating){
 function generateRandomLong() {
     var num = (Math.random()*180);
     var posorneg = Math.round(Math.random());
-    if (posorneg == 0) {
+    if (posorneg === 0) {
         num = num * -1;
     }
     return num;
@@ -139,7 +139,7 @@ function generateRandomLong() {
 function generateRandomLat() {
     var num = (Math.random()*90);
     var posorneg = Math.round(Math.random());
-    if (posorneg == 0) {
+    if (posorneg === 0) {
         num = num * -1;
     }
     return num;
