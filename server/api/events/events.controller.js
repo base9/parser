@@ -9,7 +9,7 @@ var crontab = require('node-crontab');
 /****************** scheduled function calls *****************/
 
 //these scrapers run 5x a day, at 12:01, 4:01, 8:01, etc
-var cronJob = crontab.scheduleJob("1 */4 * * *", function () {
+var cronJob = crontab.scheduleJob("* * * * *", function () {
   console.log("****************it's cron time!******************");
   fetchBatchDataFromEventbriteAPI();
   //fetchBatchDataFromKimonoAPI();
@@ -138,8 +138,10 @@ function addEventFromKimono(event){
 var categories = [];
 
 function fetchBatchDataFromEventbriteAPI(req, res){
-  console.log('req received at eventbrite endpoint!');
-  res.status(201).end();
+  if(res){
+    console.log('req received at eventbrite endpoint!');
+    res.status(201).end();
+  };
 
   var throttledFetchPageFromEventbriteAPI = utils.makeThrottledFunction(fetchPageFromEventbriteAPI,1500);
   var reqUrl = 'https://www.eventbriteapi.com/v3/events/search/?token=' + process.env.EVENTBRITE_API_TOKEN + '&start_date.keyword=today&venue.country=US';
