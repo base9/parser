@@ -9,7 +9,7 @@ var crontab = require('node-crontab');
 /****************** scheduled function calls *****************/
 
 //these scrapers run 6x a day, at 12:01, 4:01, 8:01, etc
-var cronJob = crontab.scheduleJob("* */4 * * *", function () {
+var cronJob = crontab.scheduleJob("1 */4 * * *", function () {
   console.log("****************it's cron time!******************");
   fetchBatchDataFromEventbriteAPI();
   //fetchBatchDataFromKimonoAPI();
@@ -82,7 +82,10 @@ function getAddressFromCoords(coords) {
 //periodically by a Kimono Labs scraper.  Function will parse the events
 //and add them to our DB.
 function fetchBatchDataFromKimonoAPI(req, res) {
-  console.log('request received at kimono endpoint!');
+  if(res){
+    console.log('request received at kimono endpoint!');
+    res.status(201).end();
+  };
   
   res.status(400).end('Kimono fetching is currently disabled.');
 
