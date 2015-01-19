@@ -82,7 +82,10 @@ function getAddressFromCoords(coords) {
 //periodically by a Kimono Labs scraper.  Function will parse the events
 //and add them to our DB.
 function fetchBatchDataFromKimonoAPI(req, res) {
-  console.log('request received at kimono endpoint!');
+  if(res){
+    console.log('request received at kimono endpoint!');
+    res.status(201).end();
+  };
   
   res.status(400).end('Kimono fetching is currently disabled.');
 
