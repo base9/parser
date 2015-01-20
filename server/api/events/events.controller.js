@@ -191,7 +191,7 @@ function fetchPageFromEventbriteAPI(reqUrl,pageNumber){
             //TODO: user_id should be a special account reserved for Eventbrite_bot
             //TODO: do something better than a title match for preventing duplicate entries
           }).then(function(event_id){
-            commentController.addDummyComments(1, event_id, 3);
+            commentController.addDummyComments(event_id, 3);
           });
         } else {
           console.log("event with that ID already exists; skipping.");
