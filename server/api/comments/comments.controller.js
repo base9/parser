@@ -5,10 +5,9 @@ module.exports = {
 };
 
 
-function addDummyComments(userId,eventId, number){
+function addDummyComments(eventId, number){
   for (var i = 0; i < number; i++) {
     new Comment({
-      user_id: userId,
       event_id: eventId,
       comment: getRandomComment()
     }).save();
