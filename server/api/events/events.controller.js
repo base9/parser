@@ -5,7 +5,6 @@ var request = Bluebird.promisify(require('request'));
 var utils = require('./utils.js');
 var crontab = require('node-crontab');
 
-
 /****************** scheduled function calls *****************/
 
 //these scrapers run 6x a day, at 12:01, 4:01, 8:01, etc
@@ -13,6 +12,12 @@ var cronJob = crontab.scheduleJob("1 */4 * * *", function () {
   console.log("****************it's cron time!******************");
   fetchBatchDataFromEventbriteAPI();
   //fetchBatchDataFromKimonoAPI();
+});
+
+//Dumps events that have endTimes before 3:00 a.m. of today
+var dumpOldEventsCronJob = crontab.scheduleJob("0 3 * * *", function() {
+  console.log("DUMPING OLD EVENTS");
+  deleteOldEvents();
 });
 
 
@@ -163,7 +168,7 @@ function fetchBatchDataFromEventbriteAPI(req, res){
 function fetchPageFromEventbriteAPI(reqUrl,pageNumber){
   console.log("fetching page " + pageNumber);
   request(reqUrl + '&page=' + pageNumber)
-  .then(function (res) {
+  .then(function(res) {
     var body = JSON.parse(res[0].body);
     body.events.forEach(function(event){
       if (event.category === null) {
@@ -229,3 +234,10 @@ function getEventbritePrice(event){
   return 0;
 }
 
+/************** Deleting Old Events ******************/
+
+function deleteOldEvents() {
+  var today = Date.now();
+  Event.where('endTime', '<', today)
+    .destroy();
+}
