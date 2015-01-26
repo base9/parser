@@ -14,11 +14,6 @@ var cronJob = crontab.scheduleJob("1 */4 * * *", function () {
   //fetchBatchDataFromKimonoAPI();
 });
 
-//Dumps events that have endTimes before 3:00 a.m. of today
-var dumpOldEventsCronJob = crontab.scheduleJob("0 3 * * *", function() {
-  console.log("DUMPING OLD EVENTS");
-  deleteOldEvents();
-});
 
 
 /********************* Module.exports *************************/
@@ -234,10 +229,3 @@ function getEventbritePrice(event){
   return 0;
 }
 
-/************** Deleting Old Events ******************/
-
-function deleteOldEvents() {
-  var today = Date.now();
-  Event.where('endTime', '<', today)
-    .destroy();
-}

@@ -34,8 +34,6 @@ var app = express();
 // run app through config
 config.express(app);
 
-//run passport through config
-
 // use router for app
 router(app);
 
@@ -43,6 +41,9 @@ router(app);
 var server = app.listen(process.env.PORT || localPort[process.env.MODE]);
 console.log('app listening on port:' + (process.env.PORT || localPort[process.env.MODE]));
 
+//initiate maintenance cronjobs
+
+require('./api/maintenance/dropOldData.js');
 
 
 // expose app and server
