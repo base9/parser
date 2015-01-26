@@ -11,7 +11,4 @@ var Event = bookshelf(db).Model.extend({
   }
 });
 
-
-
-  
 module.exports = Event;
