@@ -9,8 +9,8 @@ crontab.scheduleJob("0 3 * * *", function() {
   deleteOldEvents();
 });
 
-//1 minute after dumping old events, log the # of events and comments in DB.
-crontab.scheduleJob("1 3 * * *", function() {
+//every hour, log the # of events and comments in DB.
+crontab.scheduleJob("1 * * * *", function() {
   checkTableSize();
 });
 
