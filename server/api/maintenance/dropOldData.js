@@ -31,7 +31,9 @@ function deleteOldEvents() {
           comment.destroy();
         })
       }
-      event.destroy();
+      setTimeout(function(){
+        event.destroy();
+      },100);
     });
   });
 }
