@@ -3,21 +3,24 @@ var Comment = require('../comments/comments.model.js');
 var crontab = require('node-crontab');
 
 
-//Dumps events that have endTimes before 3:00 a.m. of today
-crontab.scheduleJob("0 3 * * *", function() {
+//Dumps events that have ended
+crontab.scheduleJob("0 * * * *", function() {
   console.log("DUMPING OLD EVENTS");
   deleteOldEvents();
 });
 
-//every hour, log the # of events and comments in DB.
+//before and after maintenance, log the # of events and comments in DB.
+crontab.scheduleJob("59 * * * *", function() {
+  checkTableSize();
+});
+
 crontab.scheduleJob("1 * * * *", function() {
   checkTableSize();
 });
 
 
 function deleteOldEvents() {
-  var today = Date.now();
-  Event.where('endTime', '<', today).fetchAll({
+  Event.where('endTime', '<', Date.now()).fetchAll({
     withRelated:['comments']
   })
   .then(function(collection) {
@@ -37,10 +40,10 @@ function deleteOldEvents() {
 function checkTableSize(){
   Comment.fetchAll()
   .then(function(collection){
-    console.log(collection.length, "comments in DB after maintenance.");
+    console.log(collection.length, "comments in DB.");
   });  
   Event.fetchAll()
   .then(function(collection){
-    console.log(collection.length, "events in DB after maintenance.");
+    console.log(collection.length, "events in DB.");
   });
 }
