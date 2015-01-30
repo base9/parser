@@ -16,8 +16,8 @@ module.exports = {
 
 /****************** scheduled function calls *****************/
 
-//these scrapers run 6x a day, at 12:01, 4:01, 8:01, etc
-var cronJob = crontab.scheduleJob("1 */4 * * *", function () {
+// fetch new data at 12:03 am each day
+var cronJob = crontab.scheduleJob("3 0 * * *", function () {
   console.log("****************it's cron time!******************");
   fetchBatchDataFromEventbriteAPI();
   //fetchBatchDataFromKimonoAPI();
